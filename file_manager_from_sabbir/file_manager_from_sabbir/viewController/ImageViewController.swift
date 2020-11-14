@@ -14,8 +14,9 @@ protocol ImageControllerDelegate {
 class ImageViewController : UIViewController {
     
     @IBOutlet weak var navItem: UINavigationItem!
+    @IBOutlet weak var barItem : UIBarItem!
     @IBOutlet weak var tableView : UITableView!
-    @IBOutlet var addImageButton , saveButton : UIButton!
+    @IBOutlet var addImageButton , saveButton , homeButton , favouriteButton : UIButton!
     @IBOutlet var nameTextField : UITextField!
     var selectedImage = UIImage()
     var myDocArray = NSMutableArray()
@@ -31,7 +32,7 @@ class ImageViewController : UIViewController {
         selectedFolderName = self.delegate.getPath()
         print("selected folder path")
         print(selectedFolderName)
-        
+
         let fileManager = FileManager.default
         let paths = (NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as! NSString).appendingPathComponent(selectedFolderName)
         
@@ -52,6 +53,23 @@ class ImageViewController : UIViewController {
         let addButton = UIBarButtonItem(title: "Add",  style: .plain, target: self, action: #selector(didTapAddButton(sender:)))
         let editButton   = UIBarButtonItem(title: "Edit",  style: .plain, target: self, action: #selector(didTapEditButton(sender:)))
         navigationItem.rightBarButtonItems = [editButton , addButton]
+
+        
+    }
+    
+    @IBAction func favouriteButtonTapped()
+    {
+        
+        let favouriteVC = self.storyboard?.instantiateViewController(identifier: "FavouriteViewController") as! FavouriteViewController
+        favouriteVC.modalPresentationStyle = .fullScreen
+        self.present(favouriteVC, animated: true, completion: nil)
+        
+    }
+    
+    
+    @objc func didTapHomeButton(sender: AnyObject)
+    {
+        print("tapped home")
     }
     
     func marked()
@@ -76,10 +94,9 @@ class ImageViewController : UIViewController {
         
         //saveImageintoDocumentDirectory()
         
-        
-        
-        
     }
+    
+    
     
     func saveImageintoDocumentDirectory()
     {
@@ -153,13 +170,15 @@ class ImageViewController : UIViewController {
 
 
 
-extension ImageViewController : UITableViewDelegate , UITableViewDataSource{
+extension ImageViewController : UITableViewDelegate , UITableViewDataSource , MyCellDelegate{
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return myDocArray.count
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: TableViewCell = tableView.dequeueReusableCell(withIdentifier: "CELL",for: indexPath)as! TableViewCell
+        cell.delegate = self
+        
         let imagePath: URL = myDocArray[indexPath.row] as! URL
         let image =  UIImage(contentsOfFile: imagePath.path)
         cell.coverImageView.image = image
@@ -168,37 +187,144 @@ extension ImageViewController : UITableViewDelegate , UITableViewDataSource{
         let day = calendar.component(.day, from: date)
         let month = calendar.component(.month, from: date)
         let year = calendar.component(.year, from: date)
-        
-        cell.dateLabel.text =  "\(day)- \(month) - \(year) "
-        if cell.mark == 0
+        let imageName : String  = imagePath.lastPathComponent
+        if UserDefaults.standard.string(forKey: imageName) == "marked"
         {
-            cell.starButton.setBackgroundImage(UIImage(named: "start_icon"), for: UIControl.State.normal)
+            cell.starButton.setBackgroundImage(UIImage(named: "starMark"), for: UIControl.State.normal)
         }
         else
         {
-            cell.starButton.setBackgroundImage(UIImage(named: "startMark"), for: UIControl.State.normal)
+            cell.starButton.setBackgroundImage(UIImage(named: "star_icon"), for: UIControl.State.normal)
         }
-                
+        
+        cell.dateLabel.text =  "\(day)- \(month) - \(year) "
+
         return cell
     }
     
+    
+    func favouriteButtonTapped(cell: TableViewCell) {
+            //Get the indexpath of cell where button was tapped
+        let indexPath = self.tableView.indexPath(for: cell)
+        let imagePath: URL = myDocArray[indexPath!.row] as! URL
+        let image =  UIImage(contentsOfFile: imagePath.path)
+        let imageData = image?.jpegData(compressionQuality: 1.0)
+        
+        let fileManager = FileManager.default
+
+        let paths = (NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as NSString).appendingPathComponent("favourite")
+        if !fileManager.fileExists(atPath: paths){
+            try! fileManager.createDirectory(atPath: paths, withIntermediateDirectories: true, attributes: nil)
+            print("Dir \(paths)")
+       
+        }else{
+            print("Already taken")
+        }
+    
+        let pathURL = URL(fileURLWithPath: paths).appendingPathComponent(imagePath.lastPathComponent)
+        
+        print(pathURL.path)
+
+        //fileManager.createFile(atPath: pathURL.path, contents: imageData, attributes: nil)
+
+            print(indexPath!.row)
+        
+        let imageName : String = imagePath.lastPathComponent
+        
+        print(imageName)
+        
+        if(isKeyPresentInUserDefaults(key: imageName)) {
+             if UserDefaults.standard.string(forKey: imageName) == "marked"
+             {
+                
+                UserDefaults.standard.set("unMarked", forKey: imageName)
+                do {
+                    try fileManager.removeItem(atPath: pathURL.path)
+                            print("Local path removed successfully")
+                        } catch let error as NSError {
+                            print("------Error",error.debugDescription)
+                        }
+                
+             }
+             else{
+                UserDefaults.standard.set("marked", forKey: imageName)
+                fileManager.createFile(atPath: pathURL.path, contents: imageData, attributes: nil)
+             }
+
+        }else {
+            UserDefaults.standard.set("marked", forKey: imageName)
+            fileManager.createFile(atPath: pathURL.path, contents: imageData, attributes: nil)
+            
+        }
+        
+        
+        
+        self.tableView.reloadData()
+        
+        
+        
+        }
+    
+    
+    func isKeyPresentInUserDefaults(key: String) -> Bool {
+            return UserDefaults.standard.object(forKey: key) != nil
+        }
+    
+    
+    
+
+    
+
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 70
     }
-    
+
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         
         
-        
-        
-    }
+        if editingStyle == .delete
+                {
+                    let imagePath: URL = myDocArray[indexPath.row] as! URL
+                    let pathStr = imagePath.path
+                    
+                    
+                    myDocArray.removeObject(at: indexPath.row)
+                
+                    removeImageLocalPath(localPathName: pathStr)
+            
+            let imageName = imagePath.lastPathComponent
+            
+            if UserDefaults.standard.string(forKey: imageName) == "marked"
+            {
+                let paths = (NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as NSString).appendingPathComponent("favourite")
+                let pathURL = URL(fileURLWithPath: paths).appendingPathComponent(imagePath.lastPathComponent)
+                removeImageLocalPath(localPathName: pathURL.path)
+                  
+            }
+                    
+                    tableView.deleteRows(at: [indexPath], with: .bottom)
+                   // tableView.reloadData()
+                }
+        }
     
-    
+    func removeImageLocalPath(localPathName : String) {
+            
+            print(localPathName)
+            let filemanager = FileManager.default
+            do {
+                try filemanager.removeItem(atPath: localPathName)
+                print("Local path removed successfully")
+            } catch let error as NSError {
+                print("------Error",error.debugDescription)
+            }
+        }
+
+
 }
 
 
 extension ImageViewController : UIImagePickerControllerDelegate , UINavigationControllerDelegate{
-    
+
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let image = info[.originalImage] as? UIImage
         {
@@ -207,14 +333,14 @@ extension ImageViewController : UIImagePickerControllerDelegate , UINavigationCo
             self.dismiss(animated: true, completion: nil)
         }
     }
-    
+
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        
+
     }
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
 }

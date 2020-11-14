@@ -7,16 +7,21 @@
 
 import UIKit
 
+protocol MyCellDelegate: AnyObject {
+    func favouriteButtonTapped(cell: TableViewCell)
+}
+
+
 class TableViewCell: UITableViewCell {
     @IBOutlet weak var coverImageView : UIImageView!
     @IBOutlet weak var dateLabel : UILabel!
     @IBOutlet weak var starButton : UIButton!
     var mark = 0
+    weak var delegate: MyCellDelegate?
+    
+    
     override func awakeFromNib() {
         super.awakeFromNib()
-        mark = 0
-        starButton.setBackgroundImage(UIImage(named: "star_icon"), for: UIControl.State.normal)
-        
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -25,21 +30,13 @@ class TableViewCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
+    @IBAction func starButtonTapped(sender: AnyObject) {
+            delegate?.favouriteButtonTapped(cell: self)
+            
+        }
     
-    @IBAction func starTapped()
-    {
-        print("star tapped")
-        if mark == 0
-        {
-            mark = 1
-            starButton.setBackgroundImage(UIImage(named: "starMark"), for: UIControl.State.normal)
-        }
-        else{
-            mark = 0
-            starButton.setBackgroundImage(UIImage(named: "star_icon"), for: UIControl.State.normal)
-        }
-        
-    }
+    
+    
     
     
 }

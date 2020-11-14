@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		982F7DA4255FD44600BF69B4 /* FavouriteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 982F7DA3255FD44600BF69B4 /* FavouriteViewController.swift */; };
+		982F7DAD255FD7F800BF69B4 /* FavouriteTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 982F7DAB255FD7F800BF69B4 /* FavouriteTableViewCell.swift */; };
+		982F7DAE255FD7F800BF69B4 /* FavouriteTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 982F7DAC255FD7F800BF69B4 /* FavouriteTableViewCell.xib */; };
 		9888A8E5255BF3EC00BD4B08 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9888A8E4255BF3EC00BD4B08 /* AppDelegate.swift */; };
 		9888A8E7255BF3EC00BD4B08 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9888A8E6255BF3EC00BD4B08 /* SceneDelegate.swift */; };
 		9888A8E9255BF3EC00BD4B08 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9888A8E8255BF3EC00BD4B08 /* ViewController.swift */; };
@@ -26,6 +29,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		982F7DA3255FD44600BF69B4 /* FavouriteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavouriteViewController.swift; sourceTree = "<group>"; };
+		982F7DAB255FD7F800BF69B4 /* FavouriteTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavouriteTableViewCell.swift; sourceTree = "<group>"; };
+		982F7DAC255FD7F800BF69B4 /* FavouriteTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FavouriteTableViewCell.xib; sourceTree = "<group>"; };
 		9888A8E1255BF3EC00BD4B08 /* file_manager_from_sabbir.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = file_manager_from_sabbir.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9888A8E4255BF3EC00BD4B08 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9888A8E6255BF3EC00BD4B08 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -93,6 +99,7 @@
 		9888A8FD255BF42200BD4B08 /* viewController */ = {
 			isa = PBXGroup;
 			children = (
+				982F7DA3255FD44600BF69B4 /* FavouriteViewController.swift */,
 				98E13B9E255D01F70091DA69 /* ImagePickerController.swift */,
 				9888A8E8255BF3EC00BD4B08 /* ViewController.swift */,
 				98E13B95255CE1780091DA69 /* ImageViewController.swift */,
@@ -113,7 +120,9 @@
 		9888A90F255C3E3900BD4B08 /* cell */ = {
 			isa = PBXGroup;
 			children = (
+				982F7DAC255FD7F800BF69B4 /* FavouriteTableViewCell.xib */,
 				9888A8FF255BF9F600BD4B08 /* CollectionViewCell.swift */,
+				982F7DAB255FD7F800BF69B4 /* FavouriteTableViewCell.swift */,
 				9888A900255BF9F600BD4B08 /* CollectionViewCell.xib */,
 				98E13B98255CEF570091DA69 /* TableViewCell.swift */,
 				98E13B99255CEF570091DA69 /* TableViewCell.xib */,
@@ -183,6 +192,7 @@
 				9888A8F1255BF3ED00BD4B08 /* Assets.xcassets in Resources */,
 				9888A902255BF9F600BD4B08 /* CollectionViewCell.xib in Resources */,
 				9888A8EC255BF3EC00BD4B08 /* Main.storyboard in Resources */,
+				982F7DAE255FD7F800BF69B4 /* FavouriteTableViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -197,11 +207,13 @@
 				98E13B96255CE1780091DA69 /* ImageViewController.swift in Sources */,
 				9888A907255C23EA00BD4B08 /* Folder+CoreDataProperties.swift in Sources */,
 				9888A8EF255BF3EC00BD4B08 /* file_manager_from_sabbir.xcdatamodeld in Sources */,
+				982F7DA4255FD44600BF69B4 /* FavouriteViewController.swift in Sources */,
 				9888A8E9255BF3EC00BD4B08 /* ViewController.swift in Sources */,
 				98E13B9A255CEF570091DA69 /* TableViewCell.swift in Sources */,
 				98E13B9F255D01F70091DA69 /* ImagePickerController.swift in Sources */,
 				9888A8E5255BF3EC00BD4B08 /* AppDelegate.swift in Sources */,
 				9888A8E7255BF3EC00BD4B08 /* SceneDelegate.swift in Sources */,
+				982F7DAD255FD7F800BF69B4 /* FavouriteTableViewCell.swift in Sources */,
 				9888A90A255C25B900BD4B08 /* CoreDataManager.swift in Sources */,
 				9888A906255C23EA00BD4B08 /* Folder+CoreDataClass.swift in Sources */,
 			);

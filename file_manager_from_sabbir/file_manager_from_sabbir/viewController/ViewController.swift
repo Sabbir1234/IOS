@@ -10,6 +10,7 @@ import CoreData
 class ViewController: UIViewController {
     @IBOutlet weak var collectionView : UICollectionView!
     @IBOutlet weak var homeLabel , favLabel : UILabel!
+    @IBOutlet weak var favouriteButton : UIButton!
     var selectedFolderPath : String?
     var folderArray = [Folder]()
     var editTag = 0
@@ -99,7 +100,15 @@ class ViewController: UIViewController {
         
     }
     
-    
+    @IBAction func favouriteAtHomeTapped()
+    {
+        
+        let favouriteVC = self.storyboard?.instantiateViewController(identifier: "FavouriteViewController") as! FavouriteViewController
+        
+        self.navigationController?.pushViewController(favouriteVC, animated: true)
+        
+        
+    }
     
     
     
