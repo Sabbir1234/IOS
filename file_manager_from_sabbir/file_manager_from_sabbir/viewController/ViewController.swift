@@ -21,7 +21,7 @@ class ViewController: UIViewController {
         folderArray = CoreDataManager.fetchData()
         collectionView.reloadData()
         
-        print("hello")
+        print("Welcome to File Manager")
         
         
     }

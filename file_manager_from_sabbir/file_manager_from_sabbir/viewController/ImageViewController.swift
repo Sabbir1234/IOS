@@ -62,6 +62,7 @@ class ImageViewController : UIViewController {
         
         let favouriteVC = self.storyboard?.instantiateViewController(identifier: "FavouriteViewController") as! FavouriteViewController
         favouriteVC.modalPresentationStyle = .fullScreen
+        favouriteVC.delegate = self
         self.present(favouriteVC, animated: true, completion: nil)
         
     }
@@ -188,9 +189,12 @@ extension ImageViewController : UITableViewDelegate , UITableViewDataSource , My
         let month = calendar.component(.month, from: date)
         let year = calendar.component(.year, from: date)
         let imageName : String  = imagePath.lastPathComponent
+        
         if UserDefaults.standard.string(forKey: imageName) == "marked"
         {
             cell.starButton.setBackgroundImage(UIImage(named: "starMark"), for: UIControl.State.normal)
+            print("image name : ")
+            print(imageName)
         }
         else
         {
@@ -213,6 +217,11 @@ extension ImageViewController : UITableViewDelegate , UITableViewDataSource , My
         let fileManager = FileManager.default
 
         let paths = (NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as NSString).appendingPathComponent("favourite")
+        
+        print(paths)
+//        print("paths is -------")
+//        print(paths)
+//        print("complete")
         if !fileManager.fileExists(atPath: paths){
             try! fileManager.createDirectory(atPath: paths, withIntermediateDirectories: true, attributes: nil)
             print("Dir \(paths)")
@@ -221,18 +230,19 @@ extension ImageViewController : UITableViewDelegate , UITableViewDataSource , My
             print("Already taken")
         }
     
-        let pathURL = URL(fileURLWithPath: paths).appendingPathComponent(imagePath.lastPathComponent)
+//  was      let pathURL = URL(fileURLWithPath: paths).appendingPathComponent(imagePath.lastPathComponent)
         
+        //let pathOne = URL(fileURLWithPath: paths).appendingPathComponent(selectedFolderName)
+        let pathURL = URL(fileURLWithPath: paths).appendingPathComponent(imagePath.lastPathComponent)
+        print("path url path")
         print(pathURL.path)
-
+        
+        print("complete")
         //fileManager.createFile(atPath: pathURL.path, contents: imageData, attributes: nil)
-
-            print(indexPath!.row)
         
         let imageName : String = imagePath.lastPathComponent
         
-        print(imageName)
-        
+
         if(isKeyPresentInUserDefaults(key: imageName)) {
              if UserDefaults.standard.string(forKey: imageName) == "marked"
              {
@@ -343,4 +353,14 @@ extension ImageViewController : UIImagePickerControllerDelegate , UINavigationCo
 
 
 
+}
+
+
+
+extension ImageViewController : takeFromImageViewController
+{
+    func getFolderName() -> String
+    {
+        return selectedFolderName
+    }
 }
