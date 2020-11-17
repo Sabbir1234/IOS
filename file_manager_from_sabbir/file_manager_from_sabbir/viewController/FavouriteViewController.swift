@@ -15,15 +15,27 @@ class FavouriteViewController: UIViewController {
     @IBOutlet weak var favouriteTableView : UITableView!
     @IBOutlet weak var homeButton , favouriteButton : UIButton!
     var delegate : takeFromImageViewController!
-    var myDocArray = NSMutableArray()
+    
+    var editTag = 0
+//   var favArray = [Favourite]()
+    var favArray = [ImageDB]()
     override func viewDidLoad() {
         super.viewDidLoad()
-        //self.setupTableView()
-        self.getImageFromDocumentDirectory()
-        self.setupTableView()
         
+        self.setupTableView()
+        favArray = ImageDBManager.fetchFavouriteImage(icon_name: "starMark")
+            //favouriteTableView.reloadData()
         
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        favArray = ImageDBManager.fetchFavouriteImage(icon_name: "starMark")
+        self.setupTableView()
+        favouriteTableView.reloadData()
+    }
+    
+   
+    
     
     func setupTableView()
     {
@@ -33,36 +45,18 @@ class FavouriteViewController: UIViewController {
         favouriteTableView.tableFooterView = UIView.init()
     }
     
-    func getImageFromDocumentDirectory(){
-            
-        let fileManager = FileManager.default
-        let paths = (NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as NSString).appendingPathComponent("favourite")
-        
-            //let fileManager = FileManager.default
-            let documentsURL = URL(fileURLWithPath: paths)
-            do {
-                
-                let fileArray : NSArray = try fileManager.contentsOfDirectory(at: documentsURL, includingPropertiesForKeys: nil) as NSArray
-                myDocArray = fileArray.mutableCopy() as! NSMutableArray
-                
-               
-                
-            } catch {
-                print("Error while enumerating files \(documentsURL.path): \(error.localizedDescription)")
-            }
-            
-            
-            
-          favouriteTableView.reloadData()
-            
    
-            
-        }
     
     @IBAction func homeButtonTapped()
     {
-        
+        if let nav = self.navigationController {
+            self.dismiss(animated: true, completion: nil)
+                    nav.popViewController(animated: true)
+                } else {
+                    self.dismiss(animated: true, completion: nil)
+                }
         self.dismiss(animated: true, completion: nil)
+        
         
     }
     @IBAction func favouriteButtonTapped()
@@ -76,15 +70,24 @@ class FavouriteViewController: UIViewController {
 
 extension FavouriteViewController : UITableViewDelegate , UITableViewDataSource, FavouriteCellDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return myDocArray.count
+        return favArray.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: FavouriteTableViewCell = favouriteTableView.dequeueReusableCell(withIdentifier: "CELL",for: indexPath) as! FavouriteTableViewCell
+        
         cell.delegate = self
-        let imagePath: URL = myDocArray[indexPath.row] as! URL
-        let image =  UIImage(contentsOfFile: imagePath.path)
+        let obj = favArray[indexPath.row]
+        let imageName = obj.image_name!
+        //let fileManager = FileManager.default
+        let paths = (NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as! NSString).appendingPathComponent(imageName)
+        
+        let image = UIImage(contentsOfFile: paths)
+        
         cell.favouriteImageView.image = image
+        
+        cell.starButton.setBackgroundImage(UIImage(named: "starMark"), for: UIControl.State.normal)
+        cell.imageNameLabel.text = imageName
         
         return cell
     }
@@ -92,23 +95,11 @@ extension FavouriteViewController : UITableViewDelegate , UITableViewDataSource,
     
     func  favouriteButtonTapped(cell: FavouriteTableViewCell) {
         let indexPath = self.favouriteTableView.indexPath(for: cell)
-        let imagePath: URL = myDocArray[indexPath!.row] as! URL
-        let imageName = imagePath.lastPathComponent
-        let fileManager = FileManager.default
-        let paths = (NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as NSString).appendingPathComponent("favourite")
-        let pathURL = URL(fileURLWithPath: paths).appendingPathComponent(imageName)
+        let obj = favArray[indexPath!.row]
+        let imageName = obj.image_name!
         UserDefaults.standard.set("unMarked", forKey: imageName)
-        
-        do {
-            try fileManager.removeItem(atPath: pathURL.path)
-                    print("Local path removed successfully")
-                } catch let error as NSError {
-                    print("------Error",error.debugDescription)
-                }
-        myDocArray.removeObject(at: indexPath!.row)
-        
-        //favouriteTableView.deleteRows(at: [indexPathOne?.row], with: .bottom)
-        
+        ImageDBManager.updateIcon(image_name: imageName)
+        favArray = ImageDBManager.fetchFavouriteImage(icon_name: "starMark")
         favouriteTableView.reloadData()
         
         

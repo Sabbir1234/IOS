@@ -32,8 +32,19 @@ class TableViewCell: UITableViewCell {
     
     @IBAction func starButtonTapped(sender: AnyObject) {
             delegate?.favouriteButtonTapped(cell: self)
+//            if mark == 0
+//            {
+//                mark = 1
+//                starButton.setBackgroundImage(UIImage(named: "starMark"), for: UIControl.State.normal)
+//            }
+//            else{
+//                mark = 0
+//                starButton.setBackgroundImage(UIImage(named: "star_icon"), for: UIControl.State.normal)
+//            }
             
         }
+    
+    
     
     
     
