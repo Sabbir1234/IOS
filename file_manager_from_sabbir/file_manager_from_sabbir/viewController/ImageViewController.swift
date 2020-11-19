@@ -11,7 +11,7 @@ protocol ImageControllerDelegate {
 }
 
 
-class ImageViewController : UIViewController {
+class ImageViewController : UIViewController  {
     
     @IBOutlet weak var navItem: UINavigationItem!
     @IBOutlet weak var barItem : UIBarItem!
@@ -24,9 +24,9 @@ class ImageViewController : UIViewController {
     var favArray = [ImageDB]()
     var imageArray = [ImageDB]()
     var delegate : ImageControllerDelegate!
-    
+    var indexForCell : Int!
     var editTag = 0
-    
+    var indexPath = IndexPath()
     override func viewDidLoad() {
         super.viewDidLoad()
         selectedFolderName = self.delegate.getPath()
@@ -34,14 +34,12 @@ class ImageViewController : UIViewController {
         imageArray = ImageDBManager.fetchFolderImage(folder_name: selectedFolderName)
         self.setupBarButton()
         self.setupTableView()
-        
-        //tableView.reloadData()
-    
-        print("selected folder path")
-        print(selectedFolderName)
-        
         let fileManager = FileManager.default
         let paths = (NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as! NSString).appendingPathComponent(selectedFolderName)
+        
+        navigationItem.title =   "Folder Name: \(selectedFolderName)"
+        
+       
         
     }
     override func viewWillAppear(_ animated: Bool) {
@@ -65,14 +63,15 @@ class ImageViewController : UIViewController {
         let addButton = UIBarButtonItem(title: "Add",  style: .plain, target: self, action: #selector(didTapAddButton(sender:)))
         let editButton   = UIBarButtonItem(title: "Edit",  style: .plain, target: self, action: #selector(didTapEditButton(sender:)))
         navigationItem.rightBarButtonItems = [editButton , addButton]
-        
-    
-        
-        
     }
+    
+    
+    
+    
     
     @IBAction func favouriteButtonTapped()
     {
+        print("got")
         if editTag == 1
         {
             return
@@ -143,26 +142,39 @@ class ImageViewController : UIViewController {
         
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
+  
     @objc func didTapEditButton(sender: AnyObject){
         if editTag == 0
         {
             editTag = 1
             navigationItem.rightBarButtonItems?[0].title = "Done"
             navigationItem.hidesBackButton = true
+            //UITabBarController.tabBar.userInteractionEnabled = NO;
+            if let items =  self.tabBarController?.tabBar.items {
+
+                    for i in 0 ..< items.count {
+
+                        let itemToDisable = items[i]
+                        itemToDisable.isEnabled = false
+
+                    }
+                }
+
         }
         else{
             editTag = 0
             navigationItem.rightBarButtonItems?[0].title = "Edit"
             navigationItem.hidesBackButton = false
+            if let items =  self.tabBarController?.tabBar.items {
+
+                    for i in 0 ..< items.count {
+
+                        let itemToDisable = items[i]
+                        itemToDisable.isEnabled = true
+
+                    }
+                }
+            
         }
     }
     
@@ -172,7 +184,10 @@ class ImageViewController : UIViewController {
 
 
 
-extension ImageViewController : UITableViewDelegate , UITableViewDataSource , MyCellDelegate{
+extension ImageViewController : UITableViewDelegate , UITableViewDataSource , MyCellDelegate {
+    
+    
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return imageArray.count
     }
@@ -180,7 +195,7 @@ extension ImageViewController : UITableViewDelegate , UITableViewDataSource , My
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: TableViewCell = tableView.dequeueReusableCell(withIdentifier: "CELL",for: indexPath)as! TableViewCell
         cell.delegate = self
-        
+        tableView.reloadRows(at: [indexPath], with: .fade)
         let imageName = imageArray[indexPath.row].image_name
         let iconName = imageArray[indexPath.row].icon_name
         
@@ -194,70 +209,75 @@ extension ImageViewController : UITableViewDelegate , UITableViewDataSource , My
         cell.starButton.setBackgroundImage(UIImage(named: iconName!), for: UIControl.State.normal)
         
         cell.dateLabel.text = fileName
+        
+        //tableView.reloadData()
         return cell
     }
     
     
-    func favouriteButtonTapped(cell: TableViewCell) {
-        
+    func favouriteButtonTapped(cell: TableViewCell)  {
+
         if editTag == 1
         {
-          return
+           return
         }
         
-        let indexPath = self.tableView.indexPath(for: cell)
-        let imageName = imageArray[indexPath!.row].image_name!
         
+
+        self.indexPath = self.tableView.indexPath(for: cell)!
+
         
-        
+
+        let imageName = imageArray[indexPath.row].image_name!
         if(isKeyPresentInUserDefaults(key: imageName)) {
-            
+
             if UserDefaults.standard.string(forKey: imageName) == "mark"
             {
                 UserDefaults.standard.set("unmark", forKey: imageName)
+                print("unmarked")
                 cell.starButton.setBackgroundImage(UIImage(named: "start_icon"), for: UIControl.State.normal)
+               
             }
             else{
                 UserDefaults.standard.set("mark", forKey: imageName)
+                print("marked")
                 cell.starButton.setBackgroundImage(UIImage(named: "startMark"), for: UIControl.State.normal)
+                
             }
-            
+
         }else {
             UserDefaults.standard.set("mark", forKey: imageName)
+            print("marked")
             cell.starButton.setBackgroundImage(UIImage(named: "startMark"), for: UIControl.State.normal)
         }
-        self.tableView.reloadData()
         ImageDBManager.updateIcon(image_name: imageName)
-        selectedFolderName = self.delegate.getPath()
+        imageArray = ImageDBManager.fetchFolderImage(folder_name: selectedFolderName)
         
         
+        let indexPathRow: Int = indexPath.row
+        let indexPosition = IndexPath(row: indexPathRow, section: 0)
+        self.tableView.beginUpdates()
+        self.tableView.reloadRows(at: [indexPosition], with: UITableView.RowAnimation.fade)
+        self.tableView.endUpdates()
         
-        
-        
+
     }
     
     func isKeyPresentInUserDefaults(key: String) -> Bool {
         return UserDefaults.standard.object(forKey: key) != nil
     }
     
-    
-    
-    
-    
-    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 70
+        return 80
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        
+  
         if editTag == 1
         {
             
-            
             if editingStyle == .delete
             {
-               
                     let imageName = imageArray[indexPath.row].image_name!
                     imageArray.remove(at: indexPath.row)
                     ImageDBManager.deleteData(withIndex: indexPath.row)
@@ -265,26 +285,13 @@ extension ImageViewController : UITableViewDelegate , UITableViewDataSource , My
                     if UserDefaults.standard.string(forKey: imageName) == "marked"
                     {
                         UserDefaults.standard.set("unMarked", forKey: imageName)
-                        
                     }
-                    
                     tableView.deleteRows(at: [indexPath], with: .bottom)
-                    
-                }
-            
-            
-            
-            
-            
+            }
             
         }
         
-        
-            
-            
-            //tableView.reloadData()
-        
-    }
+}
     
     func removeImageLocalPath(localPathName : String) {
         let fileManager = FileManager.default
@@ -323,14 +330,7 @@ extension ImageViewController : UIImagePickerControllerDelegate , UINavigationCo
         self.dismiss(animated: true, completion: nil)
     }
     
-    
-    
-    
-    
-    
 }
-
-
 
 extension ImageViewController : takeFromImageViewController
 {

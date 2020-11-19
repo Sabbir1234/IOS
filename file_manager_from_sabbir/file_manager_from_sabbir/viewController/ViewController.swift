@@ -19,10 +19,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setNavButton()
+        //collectionView.transform = CGAffineTransform.init(rotationAngle: (-(CGFloat)(Double.pi)))
         folderArray = CoreDataManager.fetchData()
-        
-        
-        
         self.setupCollectionView()
         //collectionView.reloadData()
         
@@ -77,6 +75,10 @@ class ViewController: UIViewController {
                 CoreDataManager.insertData(name : name, path: name)
                 
                 self.folderArray = CoreDataManager.fetchData()
+                
+                
+                
+                
                 self.collectionView.reloadData()
             }
             
@@ -104,17 +106,7 @@ class ViewController: UIViewController {
     
     
     
-    @IBAction func favouriteAtHomeTapped()
-    {
-        if editTag == 0
-        {
-            let favouriteVC = self.storyboard?.instantiateViewController(identifier: "FavouriteViewController") as! FavouriteViewController
-            
-            self.navigationController?.pushViewController(favouriteVC, animated: true)
-        }
-        
-        
-    }
+   
     
     
     
@@ -123,11 +115,34 @@ class ViewController: UIViewController {
         if editTag == 0
         {
             editTag = 1
-            self.navigationItem.rightBarButtonItem?.title = "Done"
+            navigationItem.rightBarButtonItems?[0].title = "Done"
+            //self.navigationItem.leftBarButtonItem = nil
+            self.navigationItem.leftBarButtonItem?.isEnabled = false
+     
+            if let items =  self.tabBarController?.tabBar.items {
+
+                    for i in 0 ..< items.count {
+
+                        let itemToDisable = items[i]
+                        itemToDisable.isEnabled = false
+
+                    }
+                }
+
         }
         else{
-            editTag = 0;
-            self.navigationItem.rightBarButtonItem?.title = "Edit"
+            editTag = 0
+            navigationItem.rightBarButtonItems?[0].title = "Edit"
+            self.navigationItem.leftBarButtonItem?.isEnabled = true
+            if let items =  self.tabBarController?.tabBar.items {
+
+                    for i in 0 ..< items.count {
+
+                        let itemToDisable = items[i]
+                        itemToDisable.isEnabled = true
+
+                    }
+                }
             
         }
     }
@@ -158,6 +173,7 @@ extension ViewController : UICollectionViewDelegate , UICollectionViewDataSource
         
         cell.folderIcon.image = UIImage(named: "folder")
         cell.folderNameLabel.text = folderArray[indexPath.row].folder_name
+        //cell.transform = CGAffineTransform(rotationAngle: CGFloat.pi)
         return cell
         
     }
@@ -167,11 +183,11 @@ extension ViewController : UICollectionViewDelegate , UICollectionViewDataSource
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 60
+        return 5
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 56
+        return 10
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
