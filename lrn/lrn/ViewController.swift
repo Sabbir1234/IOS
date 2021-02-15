@@ -60,6 +60,9 @@ extension ViewController: UITableViewDelegate , UITableViewDataSource{
             if defaultSelection[indexPath.section] == indexPath.row{
                 cell.backgroundColor = .cyan
             }
+            else{
+                cell.backgroundColor = .none
+            }
         }
         return cell
     }
@@ -74,6 +77,13 @@ extension ViewController: UITableViewDelegate , UITableViewDataSource{
         }
 
         return 10
+    }
+    
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        defaultSelection[indexPath.section] = indexPath.row
+        tableView.reloadSections(IndexSet(integer: indexPath.section), with: .automatic)
+        
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
